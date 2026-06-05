@@ -1,0 +1,12 @@
+{
+  "compilerOptions": {
+    "target": "es6",
+    "checkJs": false
+  },
+  "include": [
+    "*.js",
+    "**/*.js",
+    "c:\\Users\\User\\.vscode\\extensions\\samplavigne.p5-vscode-1.2.16\\p5types\\global.d.ts"
+  ],
+  "typeAcquisition": { "include": ["ml5"] }
+}
