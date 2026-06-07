@@ -70,23 +70,23 @@ function preload() {
 
   const pathPrefix = ''; 
   tracks = [
-    { name: "brain", file: loadSound(pathPrefix + 'brain.m4a', () => console.log("✅ brain")), baseDifficulty: "NORMAL" },
-    { name: "吉伊卡哇", file: loadSound(pathPrefix + 'chikawa.m4a', () => console.log("✅ chikawa")), baseDifficulty: "NORMAL" },
-    { name: "chipchip", file: loadSound(pathPrefix + 'chipchip.m4a', () => console.log("✅ chipchip")), baseDifficulty: "EASY" },
-    { name: "jojo", file: loadSound(pathPrefix + 'jojo.m4a', () => console.log("✅ jojo")), baseDifficulty: "HARD" },
-    { name: "rat", file: loadSound(pathPrefix + 'rat.m4a', () => console.log("✅ rat")), baseDifficulty: "EASY" },
-    { name: "sing", file: loadSound(pathPrefix + 'sing.m4a', () => console.log("✅ sing")), baseDifficulty: "NORMAL" },
-    { name: "sister", file: loadSound(pathPrefix + 'sister.m4a', () => console.log("✅ sister")), baseDifficulty: "NORMAL" },
-    { name: "turn", file: loadSound(pathPrefix + 'turn.m4a', () => console.log("✅ turn")), baseDifficulty: "NORMAL" },
-    { name: "turtle", file: loadSound(pathPrefix + 'turtle.m4a', () => console.log("✅ turtle")), baseDifficulty: "EASY" },
-    { name: "violin", file: loadSound(pathPrefix + 'violin.m4a', () => console.log("✅ violin")), baseDifficulty: "HARD" },
-    { name: "dog", file: loadSound(pathPrefix + 'dog.mp3', () => console.log("✅ dog")), baseDifficulty: "EASY" },
-    { name: "holiday", file: loadSound(pathPrefix + 'holiday.mp3', () => console.log("✅ holiday")), baseDifficulty: "NORMAL" },
-    { name: "kgmze", file: loadSound(pathPrefix + 'kgmze-nsatb.mp3', () => console.log("✅ kgmze")), baseDifficulty: "NORMAL" },
+    { name: "Brain", file: loadSound(pathPrefix + 'brain.m4a', () => console.log("✅ Brain")), baseDifficulty: "NORMAL" },
+    { name: "Chiikawa", file: loadSound(pathPrefix + 'chikawa.m4a', () => console.log("✅ Chiikawa")), baseDifficulty: "NORMAL" },
+    { name: "Chipchip", file: loadSound(pathPrefix + 'chipchip.m4a', () => console.log("✅ Chipchip")), baseDifficulty: "EASY" },
+    { name: "JoJo", file: loadSound(pathPrefix + 'jojo.m4a', () => console.log("✅ JoJo")), baseDifficulty: "HARD" },
+    { name: "Rat", file: loadSound(pathPrefix + 'rat.m4a', () => console.log("✅ Rat")), baseDifficulty: "EASY" },
+    { name: "Sing", file: loadSound(pathPrefix + 'sing.m4a', () => console.log("✅ Sing")), baseDifficulty: "NORMAL" },
+    { name: "Sister", file: loadSound(pathPrefix + 'sister.m4a', () => console.log("✅ Sister")), baseDifficulty: "NORMAL" },
+    { name: "Turn", file: loadSound(pathPrefix + 'turn.m4a', () => console.log("✅ Turn")), baseDifficulty: "NORMAL" },
+    { name: "Turtle", file: loadSound(pathPrefix + 'turtle.m4a', () => console.log("✅ Turtle")), baseDifficulty: "EASY" },
+    { name: "Violin", file: loadSound(pathPrefix + 'violin.m4a', () => console.log("✅ Violin")), baseDifficulty: "HARD" },
+    { name: "Dog", file: loadSound(pathPrefix + 'dog.mp3', () => console.log("✅ Dog")), baseDifficulty: "EASY" },
+    { name: "Holiday", file: loadSound(pathPrefix + 'holiday.mp3', () => console.log("✅ Holiday")), baseDifficulty: "NORMAL" },
+    { name: "KGMZE", file: loadSound(pathPrefix + 'kgmze-nsatb.mp3', () => console.log("✅ KGMZE")), baseDifficulty: "NORMAL" },
     { name: "Movie", file: loadSound(pathPrefix + 'Movie.mp3', () => console.log("✅ Movie")), baseDifficulty: "NORMAL" },
-    { name: "草東沒有派對", file: loadSound(pathPrefix + 'No Party for Cao Dong.mp3', () => console.log("✅ 草東")), baseDifficulty: "HARD" },
-    { name: "summer", file: loadSound(pathPrefix + 'summer.mp3', () => console.log("✅ summer")), baseDifficulty: "NORMAL" },
-    { name: "usaki", file: loadSound(pathPrefix + 'usaki.mp3', () => console.log("✅ usaki")), baseDifficulty: "HARD" }, 
+    { name: "Cao Dong", file: loadSound(pathPrefix + 'No Party for Cao Dong.mp3', () => console.log("✅ Cao Dong")), baseDifficulty: "HARD" },
+    { name: "Summer", file: loadSound(pathPrefix + 'summer.mp3', () => console.log("✅ Summer")), baseDifficulty: "NORMAL" },
+    { name: "Usaki", file: loadSound(pathPrefix + 'usaki.mp3', () => console.log("✅ Usaki")), baseDifficulty: "HARD" }, 
     { name: "Yee", file: loadSound(pathPrefix + 'Yee.mp3', () => console.log("✅ Yee")), baseDifficulty: "EASY" }
   ];
 }
@@ -807,7 +807,11 @@ function handleGeneralPress(inputX, inputY) {
   let boxW = videoW * (width < 600 ? 0.31 : 0.28); let boxH = width < 600 ? 130 : 110; let gap = (videoW - (boxW * 3)) / 4;
   let x1 = videoX + gap; let x2 = x1 + boxW + gap; let x3 = x2 + boxW + gap;
   if (gameState === "START") {
-    if (inputX > x1 && inputX < x1 + boxW && inputY > pickerY && inputY < pickerY + boxH) { currentTrackIndex = (currentTrackIndex + 1) % tracks.length; return; }
+    if (inputX > x1 && inputX < x1 + boxW && inputY > pickerY && inputY < pickerY + boxH) { 
+      currentTrackIndex = (currentTrackIndex + 1) % tracks.length; 
+      currentDiffIndex = difficulties.indexOf(tracks[currentTrackIndex].baseDifficulty);
+      return; 
+    }
     if (inputX > x2 && inputX < x2 + boxW && inputY > pickerY && inputY < pickerY + boxH) { currentDiffIndex = (currentDiffIndex + 1) % difficulties.length; return; }
     if (inputX > x3 && inputX < x3 + boxW && inputY > pickerY && inputY < pickerY + boxH) { currentHandModeIndex = (currentHandModeIndex + 1) % handModes.length; return; }
     
