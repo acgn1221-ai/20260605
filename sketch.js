@@ -289,10 +289,10 @@ function runTutorialLogic() {
 
   push(); fill(255); textSize(width < 600 ? 16 : 22); drawingContext.shadowBlur = 15; drawingContext.shadowColor = color(0, 255, 255);
   let guideText = "";
-  if (tutorialStage === 0) guideText = "【第一課：左手切粉紅球】\n用產生的「粉紅雷射光束」滑行劃過粉紅色球體！";
-  else if (tutorialStage === 1) guideText = "【第二課：右手切青藍球】\n用產生的「青藍雷射光束」滑行劃過青藍色球體！";
-  else if (tutorialStage === 2) guideText = "【第三課：避開紅色炸彈】\n這是炸彈！任何雷射「絕對不能劃到它」\n點擊畫面上半部即可完成教學！";
-  text(guideText, width / 2, videoY - 75); pop();
+  if (tutorialStage === 0) guideText = "用產生的「粉紅雷射光束」滑行劃過粉紅色球體！";
+  else if (tutorialStage === 1) guideText = "用產生的「青藍雷射光束」滑行劃過青藍色球體！";
+  else if (tutorialStage === 2) guideText = "這是炸彈！\n點擊畫面上半部即可完成教學！";
+  text(guideText, width / 2, videoY - 50); pop();
 
   for (let n of tutorialNotes) { n.display(1.0); }
 
@@ -723,18 +723,18 @@ function drawEndScreen() {
   // 右面板：排行榜
   drawNeonBox(blockX2 - (width < 600 ? 130 : 190), height * 0.19, width < 600 ? 260 : 380, height * 0.42, color('#00ffff'), 1.0);
   
-  noStroke(); fill('#00ffff'); textSize(width < 600 ? 15 : 20); text(`🏆 TOP 3 RANKING`, blockX2, height * 0.24);
-  textSize(width < 600 ? 11 : 14); fill(180); text(`[ ${songName} - ${diffName} ]`, blockX2, height * 0.29);
+  noStroke(); fill('#00ffff'); textSize(width < 600 ? 13 : 20); text(`🏆 TOP 3 RANKING`, blockX2, height * 0.24);
+  textSize(width < 600 ? 9 : 14); fill(180); text(`[ ${songName} - ${diffName} ]`, blockX2, height * 0.29);
   
   for (let i = 0; i < 3; i++) {
     let rankY = height * 0.36 + (i * (height * 0.07));
     if (i < boardData.length) {
       let record = boardData[i]; let entryColor = (i === 0) ? color('#fffa65') : ((i === 1) ? color('#fff') : color('#ff9f43'));
       if (record.name === playerName && record.score === score) entryColor = color('#00ffff');
-      fill(entryColor); textSize(width < 600 ? 14 : 18); textAlign(LEFT); text(` 👑 No.${i+1}  ${record.name}`, blockX2 - (width < 600 ? 110 : 160), rankY);
+      fill(entryColor); textSize(width < 600 ? 12 : 18); textAlign(LEFT); text(` 👑 No.${i+1}  ${record.name}`, blockX2 - (width < 600 ? 110 : 160), rankY);
       textAlign(RIGHT); text(`${record.score} P`, blockX2 + (width < 600 ? 110 : 160), rankY);
     } else {
-      fill(100); textSize(width < 600 ? 13 : 16); textAlign(CENTER); text(`No.${i+1}  --- EMPTY ---`, blockX2, rankY);
+      fill(100); textSize(width < 600 ? 11 : 16); textAlign(CENTER); text(`No.${i+1}  --- EMPTY ---`, blockX2, rankY);
     }
   }
   
