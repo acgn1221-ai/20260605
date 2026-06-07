@@ -433,7 +433,14 @@ function runGame(beatScale) {
     }
   }
   drawUI(remaining, beatScale); 
-  if (remaining <= 0 || (currentSong && !currentSong.isPlaying())) endGame();
+  if (remaining <= 0 || (currentSong && !currentSong.isPlaying() && !isSongLoading)) endGame();
+}
+
+// 在 draw 函式中處理 Loading 遮罩
+if (isSongLoading) {
+  push(); fill(0, 0, 0, 200); rect(0, 0, width, height);
+  fill(255); textSize(24); text("Loading Track...", width/2, height/2); pop();
+  return; 
 }
 
 function playHitSound(type) {
