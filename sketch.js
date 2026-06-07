@@ -93,7 +93,15 @@ function preload() {
 function setup() {
   createCanvas(windowWidth, windowHeight);
   
-  video = createCapture(VIDEO, { flipped: true });
+  // 🚀 優化 1：限制手機版的攝影機解析度，減輕 AI 運算負擔
+  let constraints = {
+    video: {
+      width: { ideal: width < 600 ? 320 : 640 },
+      height: { ideal: width < 600 ? 240 : 480 }
+    },
+    audio: false, flipped: true
+  };
+  video = createCapture(constraints);
   video.hide();
   handPose.detectStart(video, gotHands);
   
@@ -201,13 +209,18 @@ function drawCyberBackground(bass, treble, themeCol) {
   background('#0e011a');
   
   // 隨音樂重低音收縮的發光圓形背光
+  // 🚀 優化 3：手機版減少發光層次的複雜度
   let pulseR = map(bass, 0, 255, width*0.2, width*0.5);
   noStroke();
-  let radialGlow = drawingContext.createRadialGradient(width/2, height/2, 10, width/2, height/2, pulseR);
-  radialGlow.addColorStop(0, color(255, 0, 128, 45));
-  radialGlow.addColorStop(0.6, color(0, 255, 242, 15));
-  radialGlow.addColorStop(1, color(14, 1, 26, 0));
-  drawingContext.fillStyle = radialGlow;
+  if (width > 600) {
+    let radialGlow = drawingContext.createRadialGradient(width/2, height/2, 10, width/2, height/2, pulseR);
+    radialGlow.addColorStop(0, color(255, 0, 128, 45));
+    radialGlow.addColorStop(0.6, color(0, 255, 242, 15));
+    radialGlow.addColorStop(1, color(14, 1, 26, 0));
+    drawingContext.fillStyle = radialGlow;
+  } else {
+    fill(255, 0, 128, 20);
+  }
   ellipse(width/2, height/2, pulseR * 2);
 
   // 科技感背景網格
@@ -232,8 +245,11 @@ function drawIntroScreenB() {
 
   push();
   let titleGlow = map(sin(introTimer * 3), -1, 1, 30, 60);
-  drawingContext.shadowBlur = titleGlow; 
-  drawingContext.shadowColor = color('#ff007f');
+  // 🚀 優化 4：手機版條件式關閉 ShadowBlur
+  if (width > 600) {
+    drawingContext.shadowBlur = titleGlow; 
+    drawingContext.shadowColor = color('#ff007f');
+  }
   let titleScale = map(sin(introTimer * 1.5), -1, 1, 0.95, 1.05);
   translate(width / 2, height * 0.38); scale(titleScale);
   
@@ -248,7 +264,9 @@ function drawIntroScreenB() {
   push(); translate(width / 2, height * 0.72); scale(startTextScale);
   let isTextVisible = true; if (!introTransition && floor(introTimer * 5) % 2 === 0) isTextVisible = false;
   if (isTextVisible) {
-    drawingContext.shadowBlur = 25; drawingContext.shadowColor = color('#ffff00');
+    if (width > 600) {
+      drawingContext.shadowBlur = 25; drawingContext.shadowColor = color('#ffff00');
+    }
     stroke('#ff0055'); strokeWeight(3); fill(255, 255, 0, startTextAlpha); textSize(width < 600 ? 18 : 26); text("🎮 CLICK TO START 🎮", 0, 0);
   }
   pop();
@@ -331,8 +349,10 @@ function runTutorialLogic() {
 function drawVideoWindow() {
   push(); 
   // 霓虹背光加深
-  drawingContext.shadowBlur = 45; 
-  drawingContext.shadowColor = color(255, 0, 128, 120);
+  if (width > 600) {
+    drawingContext.shadowBlur = 45; 
+    drawingContext.shadowColor = color(255, 0, 128, 120);
+  }
   fill(18, 5, 36, 220); 
   rect(videoX - 8, videoY - 8, videoW + 16, videoH + 16, 24); // 加大圓角顯得更可愛
   
@@ -343,12 +363,13 @@ function drawVideoWindow() {
   
   // ⚡ 新增：左右兩側音遊經典「雷射判定感應軌道線」
   strokeWeight(4);
-  drawingContext.shadowBlur = 15;
   // 左判定線（粉紅）
-  stroke('#ff007f'); drawingContext.shadowColor = color('#ff007f');
+  stroke('#ff007f'); 
+  if (width > 600) { drawingContext.shadowBlur = 15; drawingContext.shadowColor = color('#ff007f'); }
   line(videoX + 25, videoY, videoX + 25, videoY + videoH);
   // 右判定線（青藍）
-  stroke('#00ffff'); drawingContext.shadowColor = color('#00ffff');
+  stroke('#00ffff'); 
+  if (width > 600) { drawingContext.shadowBlur = 15; drawingContext.shadowColor = color('#00ffff'); }
   line(videoX + videoW - 25, videoY, videoX + videoW - 25, videoY + videoH);
   
   // 外前框
@@ -401,7 +422,7 @@ function runGame(beatScale) {
 
         drawLaser(tX, tY, iX, iY, laserColor);
         
-        if (frameCount % 2 === 0) { sparkles.push(new Sparkle(lerp(tX, iX, random()), lerp(tY, iY, random()), laserColor)); if (sparkles.length > 80) sparkles.shift(); }
+        if (frameCount % (width < 600 ? 4 : 2) === 0) { sparkles.push(new Sparkle(lerp(tX, iX, random()), lerp(tY, iY, random()), laserColor)); if (sparkles.length > (width < 600 ? 30 : 80)) sparkles.shift(); }
 
         for (let note of notes) {
           if (note.active && checkCollision(tX, tY, iX, iY, note)) {
@@ -472,8 +493,10 @@ function drawJudgementPopUp() {
     
     // 粗黑撞色描邊，做出超可愛的街機風
     stroke('#000'); strokeWeight(6);
-    drawingContext.shadowBlur = 20;
-    drawingContext.shadowColor = judgementColor;
+    if (width > 600) {
+      drawingContext.shadowBlur = 20;
+      drawingContext.shadowColor = judgementColor;
+    }
     fill(judgementColor);
     
     textSize(width < 600 ? 28 : 42);
@@ -492,7 +515,9 @@ function drawLaser(x1, y1, x2, y2, col) {
   let thickness = map(sin(frameCount * 0.4), -1, 1, 10, 16); 
   let noiseOffset = (noise(frameCount * 0.15) - 0.5) * 5; 
   stroke(255); strokeWeight(4); line(x1 + noiseOffset, y1 + noiseOffset, x2 + noiseOffset, y2 + noiseOffset);
-  stroke(col); strokeWeight(thickness); drawingContext.shadowBlur = 30; drawingContext.shadowColor = col; line(x1, y1, x2, y2);
+  stroke(col); strokeWeight(thickness); 
+  if (width > 600) { drawingContext.shadowBlur = 30; drawingContext.shadowColor = col; }
+  line(x1, y1, x2, y2);
   pop();
 }
 
@@ -522,7 +547,9 @@ class Note {
   display(beatScale) {
     push(); noStroke(); 
     let dynamicRadius = this.radius * (this.isBomb ? 1.0 : beatScale);
-    drawingContext.shadowBlur = 30 * beatScale; drawingContext.shadowColor = this.color;
+    if (width > 600) {
+      drawingContext.shadowBlur = 30 * beatScale; drawingContext.shadowColor = this.color;
+    }
     
     // 畫出可愛帶有雙層發光環的音符
     fill(this.color); circle(this.x, this.y, dynamicRadius * 2);
@@ -550,7 +577,10 @@ class Ripple {
   constructor(x, y, col) { this.x = x; this.y = y; this.col = col; this.r = 10; this.maxR = 80; this.alpha = 255; }
   update() { this.r += 4.5; this.alpha = map(this.r, 10, this.maxR, 255, 0); }
   display() { push(); noFill(); stroke(this.col); strokeWeight(4); drawingContext.shadowBlur = 20; drawingContext.shadowColor = this.col; circle(this.x, this.y, this.r * 2); pop(); }
-  finished() { return this.r >= this.maxR; }
+  finished() { 
+    // 🚀 優化 5：手機版縮短漣漪壽命
+    return width < 600 ? this.r >= 40 : this.r >= this.maxR; 
+  }
 }
 function updateAndDrawRipples() { for (let i = ripples.length - 1; i >= 0; i--) { ripples[i].update(); ripples[i].display(); if (ripples[i].finished()) ripples.splice(i, 1); } }
 
@@ -610,8 +640,10 @@ function drawNeonBox(bx, by, bw, bh, activeColor, scaleFactor = 1.0) {
   drawingContext.fillStyle = grad;
   stroke(activeColor);
   strokeWeight(3);
-  drawingContext.shadowBlur = 20;
-  drawingContext.shadowColor = activeColor;
+  if (width > 600) {
+    drawingContext.shadowBlur = 20;
+    drawingContext.shadowColor = activeColor;
+  }
   rect(-bw/2, -bh/2, bw, bh, 18);
   pop();
 }
@@ -621,15 +653,18 @@ function drawUI(remaining, beatScale) {
   // 總分放大彈跳
   stroke('#000'); strokeWeight(5);
   fill('#00ffff'); textSize((width < 600 ? 42 : 64) * (beatScale * 0.96)); 
-  drawingContext.shadowBlur = 25; drawingContext.shadowColor = color(0, 255, 255);
+  if (width > 600) {
+    drawingContext.shadowBlur = 25; drawingContext.shadowColor = color(0, 255, 255);
+  }
   text(score, width / 2, videoY - 45);
   
-  noStroke(); drawingContext.shadowBlur = 0; textSize(width < 600 ? 15 : 22); fill(255); text(`TIME: ${nf(remaining, 1, 1)}s`, width / 2, videoY - 15);
+  noStroke(); textSize(width < 600 ? 15 : 22); fill(255); text(`TIME: ${nf(remaining, 1, 1)}s`, width / 2, videoY - 15);
   
   // 連擊數（Combo）街機大字化
   let textPadding = width < 600 ? 20 : 60; textAlign(RIGHT); 
   stroke('#000'); strokeWeight(4);
-  fill('#ff007f'); textSize(width < 600 ? 24 : 34); drawingContext.shadowBlur = 15; drawingContext.shadowColor = color('#ff007f');
+  fill('#ff007f'); textSize(width < 600 ? 24 : 34); 
+  if (width > 600) { drawingContext.shadowBlur = 15; drawingContext.shadowColor = color('#ff007f'); }
   text(`${combo} COMBO`, width - textPadding, videoY - 40);
   
   fill(getDifficultyColor(difficulties[currentDiffIndex])); textSize(width < 600 ? 15 : 22); 
