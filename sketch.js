@@ -292,7 +292,7 @@ function runTutorialLogic() {
   if (tutorialStage === 0) guideText = "【第一課：左手切粉紅球】\n用產生的「粉紅雷射光束」滑行劃過粉紅色球體！";
   else if (tutorialStage === 1) guideText = "【第二課：右手切青藍球】\n用產生的「青藍雷射光束」滑行劃過青藍色球體！";
   else if (tutorialStage === 2) guideText = "【第三課：避開紅色炸彈】\n這是炸彈！任何雷射「絕對不能劃到它」\n點擊畫面上半部即可完成教學！";
-  text(guideText, width / 2, videoY - 55); pop();
+  text(guideText, width / 2, videoY - 75); pop();
 
   for (let n of tutorialNotes) { n.display(1.0); }
 
@@ -586,6 +586,11 @@ function drawNeonBox(bx, by, bw, bh, activeColor, scaleFactor = 1.0) {
   translate(bx + bw/2, by + bh/2);
   scale(scaleFactor);
   
+  // 🌈 新增：底色填充，使選單方框在背景網格中更清晰
+  noStroke();
+  fill(red(activeColor), green(activeColor), blue(activeColor), 60);
+  rect(-bw/2, -bh/2, bw, bh, 18);
+
   // 可愛風粗發光邊框
   noFill();
   stroke(red(activeColor), green(activeColor), blue(activeColor), 50);
@@ -666,7 +671,7 @@ function drawStartScreen(bass) {
 
   // 🎵 曲目、難度、手勢面板
   drawNeonBox(x1, pickerY, boxW, boxH, color('#ff007f'), trackHoverScale);
-  push(); translate(x1 + boxW/2, pickerY + boxH/2); scale(trackHoverScale); noStroke(); fill('#7efff5'); textSize(width < 600 ? 12 : 15); text("◁ MUSIC ▷", 0, -boxH/2 + 25); fill(255); textSize(width < 600 ? 13 : 19); text(tracks[currentTrackIndex].name, 0, 15); pop();
+  push(); translate(x1 + boxW/2, pickerY + boxH/2); scale(trackHoverScale); noStroke(); fill('#7efff5'); textSize(width < 600 ? 12 : 15); text("◁ MUSIC ▷", 0, -boxH/2 + 25); fill('#ff0000'); textSize(width < 600 ? 13 : 19); text(tracks[currentTrackIndex].name, 0, 15); pop();
   
   let diffColor = getDifficultyColor(difficulties[currentDiffIndex]);
   drawNeonBox(x2, pickerY, boxW, boxH, diffColor, diffHoverScale);
@@ -676,6 +681,12 @@ function drawStartScreen(bass) {
   drawNeonBox(x3, pickerY, boxW, boxH, modeDispColor, modeHoverScale);
   push(); translate(x3 + boxW/2, pickerY + boxH/2); scale(modeHoverScale); noStroke(); fill('#7efff5'); textSize(width < 600 ? 11 : 15); text("◁ HANDS ▷", 0, -boxH/2 + 25); fill(modeDispColor); textSize(width < 600 ? 13 : 19); text(modeName === "ANY HAND" ? "任意手" : "雙手分色", 0, 15); pop();
   
+  // 🏆 優化：查看排行榜按鈕（手機版尺寸縮放）
+  let lbW = width < 600 ? 140 : 180; let lbH = width < 600 ? 30 : 35; let lbX = width/2 - lbW/2; let lbY = pickerY + boxH + 15;
+  let lbHover = (mouseX > lbX && mouseX < lbX + lbW && mouseY > lbY && mouseY < lbY + lbH);
+  drawNeonBox(lbX, lbY, lbW, lbH, color('#00ffff'), lbHover ? 1.05 : 1.0);
+  push(); noStroke(); fill(255); textSize(width < 600 ? 11 : 14); text("🏆 LEADERBOARD", lbX + lbW/2, lbY + lbH/2); pop();
+
   stroke('#000'); strokeWeight(3); fill('#39ff14'); textSize(width < 600 ? 16 : 22); text("【 點擊上方視訊區域 ─ 開始轟炸節奏 】", width / 2, videoY + videoH + (width < 600 ? 35 : 52)); pop();
 }
 
@@ -756,6 +767,11 @@ function handleGeneralPress(inputX, inputY) {
     if (inputX > x1 && inputX < x1 + boxW && inputY > pickerY && inputY < pickerY + boxH) { currentTrackIndex = (currentTrackIndex + 1) % tracks.length; return; }
     if (inputX > x2 && inputX < x2 + boxW && inputY > pickerY && inputY < pickerY + boxH) { currentDiffIndex = (currentDiffIndex + 1) % difficulties.length; return; }
     if (inputX > x3 && inputX < x3 + boxW && inputY > pickerY && inputY < pickerY + boxH) { currentHandModeIndex = (currentHandModeIndex + 1) % handModes.length; return; }
+    
+    // 偵測點擊排行榜按鈕
+    let lbW = width < 600 ? 140 : 180; let lbH = width < 600 ? 30 : 35; let lbX = width/2 - lbW/2; let lbY = pickerY + boxH + 15;
+    if (inputX > lbX && inputX < lbX + lbW && inputY > lbY && inputY < lbY + lbH) { gameState = "END"; return; }
+
     if (!(inputY > pickerY && inputY < pickerY + boxH)) { startGame(); }
   } 
   else if (gameState === "PLAYING" || gameState === "PAUSED") {
