@@ -66,28 +66,30 @@ let judgementScale = 0;
 let judgementAlpha = 0;
 
 function preload() {
-  handPose = ml5.handPose({ flipped: true });
+  // 1. 載入新版 handPose
+  if (typeof ml5.handPose === 'function') {
+    handPose = ml5.handPose({ flipHorizontal: true });
+  } else if (typeof ml5.handpose === 'function') {
+    handPose = ml5.handpose({ flipHorizontal: true });
+  } else if (typeof ml5.handposeModel === 'function') {
+    handPose = ml5.handposeModel.call(ml5, { flipHorizontal: true });
+  } else {
+    console.error('ml5 hand pose model function not found', Object.keys(ml5));
+  }
 
-  const pathPrefix = ''; 
+  const pathPrefix = '';
+
   tracks = [
-    { name: "Brain", file: loadSound(pathPrefix + 'brain.m4a', () => console.log("✅ Brain")), baseDifficulty: "NORMAL" },
-    { name: "Chiikawa", file: loadSound(pathPrefix + 'chikawa.m4a', () => console.log("✅ Chiikawa")), baseDifficulty: "NORMAL" },
-    { name: "Chipchip", file: loadSound(pathPrefix + 'chipchip.m4a', () => console.log("✅ Chipchip")), baseDifficulty: "EASY" },
     { name: "JoJo", file: loadSound(pathPrefix + 'jojo.m4a', () => console.log("✅ JoJo")), baseDifficulty: "HARD" },
     { name: "Rat", file: loadSound(pathPrefix + 'rat.m4a', () => console.log("✅ Rat")), baseDifficulty: "EASY" },
-    { name: "Sing", file: loadSound(pathPrefix + 'sing.m4a', () => console.log("✅ Sing")), baseDifficulty: "NORMAL" },
     { name: "Sister", file: loadSound(pathPrefix + 'sister.m4a', () => console.log("✅ Sister")), baseDifficulty: "NORMAL" },
     { name: "Turn", file: loadSound(pathPrefix + 'turn.m4a', () => console.log("✅ Turn")), baseDifficulty: "NORMAL" },
-    { name: "Turtle", file: loadSound(pathPrefix + 'turtle.m4a', () => console.log("✅ Turtle")), baseDifficulty: "EASY" },
-    { name: "Violin", file: loadSound(pathPrefix + 'violin.m4a', () => console.log("✅ Violin")), baseDifficulty: "HARD" },
-    { name: "Dog", file: loadSound(pathPrefix + 'dog.mp3', () => console.log("✅ Dog")), baseDifficulty: "EASY" },
     { name: "Holiday", file: loadSound(pathPrefix + 'holiday.mp3', () => console.log("✅ Holiday")), baseDifficulty: "NORMAL" },
-    { name: "KGMZE", file: loadSound(pathPrefix + 'kgmze-nsatb.mp3', () => console.log("✅ KGMZE")), baseDifficulty: "NORMAL" },
     { name: "Movie", file: loadSound(pathPrefix + 'Movie.mp3', () => console.log("✅ Movie")), baseDifficulty: "NORMAL" },
-    { name: "Cao Dong", file: loadSound(pathPrefix + 'No Party for Cao Dong.mp3', () => console.log("✅ Cao Dong")), baseDifficulty: "HARD" },
     { name: "Summer", file: loadSound(pathPrefix + 'summer.mp3', () => console.log("✅ Summer")), baseDifficulty: "NORMAL" },
-    { name: "Usaki", file: loadSound(pathPrefix + 'usaki.mp3', () => console.log("✅ Usaki")), baseDifficulty: "HARD" }, 
-    { name: "Yee", file: loadSound(pathPrefix + 'Yee.mp3', () => console.log("✅ Yee")), baseDifficulty: "EASY" }
+    { name: "Yee", file: loadSound(pathPrefix + 'Yee.mp3', () => console.log("✅ Yee")), baseDifficulty: "EASY" },
+    { name: "Cow", file: loadSound(pathPrefix + 'cow.m4a', () => console.log("✅ Cow")), baseDifficulty: "NORMAL" },
+    { name: "Honey Pie", file: loadSound(pathPrefix + 'honey pie.m4a', () => console.log("✅ Honey Pie")), baseDifficulty: "NORMAL" },
   ];
 }
 
@@ -100,11 +102,20 @@ function setup() {
       width: { ideal: width < 600 ? 320 : 640 },
       height: { ideal: width < 600 ? 240 : 480 }
     },
-    audio: false, flipped: true
+    audio: false
   };
   video = createCapture(constraints);
+  video.size(width < 600 ? 320 : 640, width < 600 ? 240 : 480);
   video.hide();
-  handPose.detectStart(video, gotHands);
+
+  // 3. ✨ 修正這裡：新版改用 .detectStart()
+  if (handPose && typeof handPose.detectStart === 'function') {
+    handPose.detectStart(video, gotHands);
+  } else if (handPose && typeof handPose.detect === 'function') {
+    handPose.detect(video, gotHands);
+  } else {
+    console.error('handPose detection method is not available', handPose);
+  }
   
   textFont('Impact, Arial Black, sans-serif'); // 換成更有力道、圓潤酷炫的英文字型
   textAlign(CENTER, CENTER);
@@ -366,7 +377,10 @@ function drawVideoWindow() {
   
   drawingContext.save();
   let maskPath = new Path2D(); maskPath.roundRect(videoX, videoY, videoW, videoH, 18);
-  drawingContext.clip(maskPath); image(video, videoX, videoY, videoW, videoH);
+  drawingContext.clip(maskPath);
+  translate(videoX + videoW, videoY);
+  scale(-1, 1);
+  image(video, 0, 0, videoW, videoH);
   drawingContext.restore();
   
   // ⚡ 新增：左右兩側音遊經典「雷射判定感應軌道線」
