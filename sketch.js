@@ -12,6 +12,7 @@ let score = 0;
 let combo = 0;         
 let maxCombo = 0;       
 let gameTime = 30; 
+let isSongLoading = false; 
 
 let gameState = "INTRO"; 
 
@@ -156,6 +157,13 @@ function calculateButtonLayout() {
 function gotHands(results) { hands = results; }
 
 function draw() {
+  // 處理 Loading 遮罩 (修正 Illegal return statement)
+  if (isSongLoading) {
+    push(); fill(0, 0, 0, 200); rect(0, 0, width, height);
+    fill(255); textSize(24); text("Loading Track...", width/2, height/2); pop();
+    return; 
+  }
+
   uiGlowAngle += 0.05; 
   let themeCol = getDifficultyColor(difficulties[currentDiffIndex]);
   fft.analyze();
@@ -282,7 +290,7 @@ function drawNamingScreen() {
   
   drawNeonBox(width/2 - btnW_n/2, btnY_n - btnH_n/2, btnW_n, btnH_n, isHover ? color('#ff007f') : color('#00ffff'), isHover ? 1.05 : 1.0);
   
-  noStroke(); fill(255); textSize(16); text("GO! ENTER STAGE 🎵", width / 2, btnY_n); pop();
+  noStroke(); fill(255); textSize(20); text("GO! ENTER STAGE 🎵", width / 2, btnY_n); pop();
 }
 
 function initTutorial() {
@@ -303,7 +311,7 @@ function spawnTutorialNote() {
 function runTutorialLogic() {
   let skipHover = (mouseX > skipBtnX && mouseX < skipBtnX + skipBtnW && mouseY > skipBtnY && mouseY < skipBtnY + skipBtnH);
   drawNeonBox(skipBtnX, skipBtnY, skipBtnW, skipBtnH, color('#ff00ff'), skipHover ? 1.05 : 1.0);
-  push(); noStroke(); fill(255); textSize(width < 600 ? 11 : 13); text("⏭️ SKIP", skipBtnX + skipBtnW/2, skipBtnY + skipBtnH/2); pop();
+  push(); noStroke(); fill(255); textSize(20); text("⏭️ SKIP", skipBtnX + skipBtnW/2, skipBtnY + skipBtnH/2); pop();
 
   push(); fill(255); textSize(width < 600 ? 16 : 22); drawingContext.shadowBlur = 15; drawingContext.shadowColor = color(0, 255, 255);
   let guideText = "";
@@ -434,13 +442,6 @@ function runGame(beatScale) {
   }
   drawUI(remaining, beatScale); 
   if (remaining <= 0 || (currentSong && !currentSong.isPlaying() && !isSongLoading)) endGame();
-}
-
-// 在 draw 函式中處理 Loading 遮罩
-if (isSongLoading) {
-  push(); fill(0, 0, 0, 200); rect(0, 0, width, height);
-  fill(255); textSize(24); text("Loading Track...", width/2, height/2); pop();
-  return; 
 }
 
 function playHitSound(type) {
@@ -685,13 +686,13 @@ function drawInGameButtons() {
   let h= (mouseX > homeBtnX && mouseX < homeBtnX + btnW && mouseY > btnY && mouseY < btnY + btnH);
   
   drawNeonBox(pauseBtnX, btnY, btnW, btnH, color('#00ffff'), p ? 1.05 : 1.0);
-  push(); noStroke(); fill(255); textAlign(CENTER, CENTER); textSize(width < 600 ? 11 : 13); textStyle(BOLD); text((gameState === "PAUSED") ? "▶ RESUME" : "⏸ PAUSE", pauseBtnX + btnW/2, btnY + btnH/2); pop();
+  push(); noStroke(); fill(255); textAlign(CENTER, CENTER); textSize(20); textStyle(BOLD); text((gameState === "PAUSED") ? "▶ RESUME" : "⏸ PAUSE", pauseBtnX + btnW/2, btnY + btnH/2); pop();
 
   drawNeonBox(restartBtnX, btnY, btnW, btnH, color('#ff00ff'), r ? 1.05 : 1.0);
-  push(); noStroke(); fill(255); textAlign(CENTER, CENTER); textSize(width < 600 ? 11 : 13); textStyle(BOLD); text("🔄 AGAIN", restartBtnX + btnW/2, btnY + btnH/2); pop();
+  push(); noStroke(); fill(255); textAlign(CENTER, CENTER); textSize(20); textStyle(BOLD); text("🔄 AGAIN", restartBtnX + btnW/2, btnY + btnH/2); pop();
 
   drawNeonBox(homeBtnX, btnY, btnW, btnH, color('#fffa65'), h ? 1.05 : 1.0);
-  push(); noStroke(); fill(255); textAlign(CENTER, CENTER); textSize(width < 600 ? 11 : 13); textStyle(BOLD); text("🏠 MENU", homeBtnX + btnW/2, btnY + btnH/2); pop();
+  push(); noStroke(); fill(255); textAlign(CENTER, CENTER); textSize(20); textStyle(BOLD); text("🏠 MENU", homeBtnX + btnW/2, btnY + btnH/2); pop();
 }
 
 function drawPausedScreen() { push(); fill(0, 0, 0, 190); rect(0, 0, width, height); stroke('#000'); strokeWeight(5); fill('#00ffff'); textSize(width < 600 ? 42 : 60); text("PAUSED", width / 2, height / 2); pop(); }
@@ -713,21 +714,21 @@ function drawStartScreen(bass) {
 
   // 🎵 曲目、難度、手勢面板
   drawNeonBox(x1, pickerY, boxW, boxH, color('#ff007f'), trackHoverScale);
-  push(); translate(x1 + boxW/2, pickerY + boxH/2); scale(trackHoverScale); noStroke(); fill('#7efff5'); textSize(width < 600 ? 12 : 15); text("◁ MUSIC ▷", 0, -boxH/2 + 25); fill('#ff0000'); textSize(width < 600 ? 13 : 19); text(tracks[currentTrackIndex].name, 0, 15); pop();
+  push(); translate(x1 + boxW/2, pickerY + boxH/2); scale(trackHoverScale); noStroke(); fill('#7efff5'); textSize(20); text("◁ MUSIC ▷", 0, -boxH/2 + 25); fill('#ff0000'); textSize(20); text(tracks[currentTrackIndex].name, 0, 15); pop();
   
   let diffColor = getDifficultyColor(difficulties[currentDiffIndex]);
   drawNeonBox(x2, pickerY, boxW, boxH, diffColor, diffHoverScale);
-  push(); translate(x2 + boxW/2, pickerY + boxH/2); scale(diffHoverScale); noStroke(); fill('#7efff5'); textSize(width < 600 ? 12 : 15); text("◁ MODE ▷", 0, -boxH/2 + 25); fill(diffColor); textSize(width < 600 ? 18 : 24); text(difficulties[currentDiffIndex], 0, 15); pop();
+  push(); translate(x2 + boxW/2, pickerY + boxH/2); scale(diffHoverScale); noStroke(); fill('#7efff5'); textSize(20); text("◁ MODE ▷", 0, -boxH/2 + 25); fill(diffColor); textSize(20); text(difficulties[currentDiffIndex], 0, 15); pop();
   
   let modeName = handModes[currentHandModeIndex]; let modeDispColor = (modeName === "ANY HAND") ? color('#00ffff') : color('#ff007f');
   drawNeonBox(x3, pickerY, boxW, boxH, modeDispColor, modeHoverScale);
-  push(); translate(x3 + boxW/2, pickerY + boxH/2); scale(modeHoverScale); noStroke(); fill('#7efff5'); textSize(width < 600 ? 11 : 15); text("◁ HANDS ▷", 0, -boxH/2 + 25); fill(modeDispColor); textSize(width < 600 ? 13 : 19); text(modeName === "ANY HAND" ? "任意手" : "雙手分色", 0, 15); pop();
+  push(); translate(x3 + boxW/2, pickerY + boxH/2); scale(modeHoverScale); noStroke(); fill('#7efff5'); textSize(20); text("◁ HANDS ▷", 0, -boxH/2 + 25); fill(modeDispColor); textSize(20); text(modeName === "ANY HAND" ? "任意手" : "雙手分色", 0, 15); pop();
   
   // 🏆 優化：查看排行榜按鈕（手機版尺寸縮放）
   let lbW = width < 600 ? 140 : 180; let lbH = width < 600 ? 30 : 35; let lbX = width/2 - lbW/2; let lbY = pickerY + boxH + 15;
   let lbHover = (mouseX > lbX && mouseX < lbX + lbW && mouseY > lbY && mouseY < lbY + lbH);
   drawNeonBox(lbX, lbY, lbW, lbH, color('#00ffff'), lbHover ? 1.05 : 1.0);
-  push(); noStroke(); fill(255); textSize(width < 600 ? 11 : 14); text("🏆 LEADERBOARD", lbX + lbW/2, lbY + lbH/2); pop();
+  push(); noStroke(); fill(255); textSize(20); text("🏆 LEADERBOARD", lbX + lbW/2, lbY + lbH/2); pop();
 
   stroke('#000'); strokeWeight(3); fill('#39ff14'); textSize(width < 600 ? 16 : 22); text("【 點擊上方視訊區域 ─ 開始轟炸節奏 】", width / 2, videoY + videoH + (width < 600 ? 35 : 52)); pop();
 }
@@ -784,7 +785,7 @@ function drawEndScreen() {
   let endBtnW = width < 600 ? 180 : 220; let endBtnH = width < 600 ? 45 : 50;
   let btnHover = (mouseX > width/2 - endBtnW/2 && mouseX < width/2 + endBtnW/2 && mouseY > height * 0.76 && mouseY < height * 0.76 + endBtnH);
   drawNeonBox(width/2 - endBtnW/2, height * 0.76, endBtnW, endBtnH, color('#fffa65'), btnHover ? 1.05 : 1.0);
-  push(); noStroke(); stroke('#000'); strokeWeight(2); fill(255); textSize(width < 600 ? 16 : 20); text("REPLAY 🎮", width / 2, height * 0.76 + endBtnH / 2); pop();
+  push(); noStroke(); stroke('#000'); strokeWeight(2); fill(255); textSize(20); text("REPLAY 🎮", width / 2, height * 0.76 + endBtnH / 2); pop();
 }
 
 function handleGeneralPress(inputX, inputY) {
